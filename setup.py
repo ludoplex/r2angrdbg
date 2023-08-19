@@ -17,7 +17,7 @@ setup(
     author=__author__,
     author_email=__email__,
     url='https://github.com/andreafioraldi/r2angrdbg',
-    download_url = 'https://github.com/andreafioraldi/r2angrdbg/archive/' + VER + '.tar.gz',
+    download_url=f'https://github.com/andreafioraldi/r2angrdbg/archive/{VER}.tar.gz',
     package_dir={'r2angrdbg': 'r2angrdbg'},
     packages=['r2angrdbg'],
     install_requires=['angrdbg'],

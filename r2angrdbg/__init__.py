@@ -107,7 +107,7 @@ class R2Debugger(Debugger):
     def get_reg(self, name):
         if name == "efl":
             name = "eflags"
-        return int(self.r2.cmd("dr?" + name), 16)
+        return int(self.r2.cmd(f"dr?{name}"), 16)
 
     def set_reg(self, name, value):
         if name == "efl":
@@ -129,16 +129,24 @@ class R2Debugger(Debugger):
 
     # -------------------------------------
     def seg_by_name(self, name):
-        for start, end, perms, mname in self.vmmap:
-            if name == mname:
-                return Segment(name, start, end, perms)
-        return None
+        return next(
+            (
+                Segment(name, start, end, perms)
+                for start, end, perms, mname in self.vmmap
+                if name == mname
+            ),
+            None,
+        )
 
     def seg_by_addr(self, addr):
-        for start, end, perms, name in self.vmmap:
-            if addr >= start and addr < end:
-                return Segment(name, start, end, perms)
-        return None
+        return next(
+            (
+                Segment(name, start, end, perms)
+                for start, end, perms, name in self.vmmap
+                if addr >= start and addr < end
+            ),
+            None,
+        )
 
     def get_got(self):  # return tuple(start_addr, end_addr)
         return self.got
@@ -153,12 +161,12 @@ class R2Debugger(Debugger):
             for m in modules[1:]:
                 addr = m["address"]
                 lib = os.path.basename(m["name"]).split(".")[0].split("-")[0]
-                o = self.r2.cmd("dmi* %s %s" % (lib, name))
+                o = self.r2.cmd(f"dmi* {lib} {name}")
                 for line in o.split("\n"):
                     line = line.split()
                     if len(line) < 4:
                         continue
-                    if line[1] == name or line[3] == "sym."+name:
+                    if line[1] == name or line[3] == f"sym.{name}":
                         return int(line[3], 16)
         except:
             pass
